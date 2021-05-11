@@ -1,0 +1,56 @@
+import React from 'react';
+import {
+  BrowserRouter as Router,
+  Route,
+  Redirect,
+  Switch,
+} from 'react-router-dom';
+import Users from './users/pages/Users';
+import NewPlace from './places/pages/NewPlace';
+import MainNavigation from './shared/components/Navigation/MainNavigation';
+import UserPlaces from './places/pages/UserPlaces';
+import UpdatePlace from './places/pages/UpdatePlace';
+import Auth from './users/pages/Auth';
+import { AuthProvider, useAuthContext } from './shared/context/AuthContext';
+
+const AppRoutes = () => {
+  const { isAuthenticated } = useAuthContext();
+
+  let routes;
+  if (isAuthenticated()) {
+    routes = (
+      <Switch>
+        <Route exact path='/users' component={Users} />
+        <Route exact path='/:userId/places' component={UserPlaces} />
+        <Route exact path='/places/new' component={NewPlace} />
+        <Route exact path='/places/:placeId' component={UpdatePlace} />
+        <Redirect to='/users' />
+      </Switch>
+    );
+  } else {
+    routes = (
+      <Switch>
+        <Route exact path='/users' component={Users} />
+        <Route exact path='/auth' component={Auth} />
+        <Redirect to='/auth' />
+      </Switch>
+    );
+  }
+
+  return routes;
+};
+
+const App = () => {
+  return (
+    <Router>
+      <AuthProvider>
+        <MainNavigation />
+        <main>
+          <AppRoutes />
+        </main>
+      </AuthProvider>
+    </Router>
+  );
+};
+
+export default App;
